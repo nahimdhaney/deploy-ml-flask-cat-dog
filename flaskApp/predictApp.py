@@ -3,11 +3,13 @@ import pickle
 import numpy as np
 import torch
 from PIL import Image
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, flash, jsonify
 from torchvision import datasets, transforms, models
+from flask_bootstrap import Bootstrap
 
 
 app = Flask(__name__)
+Bootstrap(app)
 
 
 def load_model():
@@ -36,9 +38,9 @@ def home():
             result += " Cat"
         else:
             result += " Dog"
-        return result
-
-    return render_template('home.html')
+        return jsonify(text=result)
+    else:
+        return render_template('home.html')
 
 
 if __name__ == '__main__':
