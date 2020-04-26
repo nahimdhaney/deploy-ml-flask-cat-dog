@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from PIL import Image
 from flask import Flask, request, render_template, flash, jsonify
-from torchvision import datasets, transforms, models
+from torchvision import datasets, transforms
 from flask_bootstrap import Bootstrap
 
 
@@ -17,6 +17,13 @@ def load_model():
     # model variable refers to the global variable
     with open('trained_model.pkl', 'rb') as f:
         model = pickle.load(f)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model.to(device)
+
+# cd flaskApp
+# export FLASK_APP=predictApp.py
+# export FLASK_APP=predictApp.py
+# flask run
 
 
 @app.route('/')
@@ -42,11 +49,6 @@ def home():
     else:
         return render_template('home.html')
 
-
-if __name__ == '__main__':
-    load_model()  # load model at the beginning once only
-load_model()
-
 # defining image loader
 
 
@@ -58,4 +60,12 @@ def image_loader(image_name):  # load the image from image loader
     image = Image.open(image_name)
     image = loader(image).float()
     image = image.unsqueeze(0)
-    return image.cuda()
+    if torch.cuda.is_available():
+        image = image.cuda()
+    return image
+    
+if __name__ == '__main__':
+    load_model()  # load model at the beginning once only
+    app.run(host='0.0.0.0', port=5000)
+#load_model()
+
